@@ -13,6 +13,7 @@ class Finger{
     void show();
     void set(float x, float y);
     ofPoint position;
+    bool moving;
     int id;
     
 };

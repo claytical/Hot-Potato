@@ -7,43 +7,48 @@
 //
 
 #include "Projectile.h"
+bool tooLong(ofPoint point){
+    return (point.z > TAIL_SIZE);
+}
 
 //--------------------------------------------------------------
 void Projectile::show(){
-    ofSetColor(255, 255, 0);
-    ofCircle(position.x, position.y, 5);
+    ofSetColor(255, 255, 0, 255);
+    ofCircle(position.x, position.y, PROJECTILE_SIZE);
+    for (int i = 0; i < tail.size(); i++) {
+        ofSetColor(255, 255, 0, ofMap(i, 0, TAIL_SIZE, 0, 127));
+        ofCircle(tail[i].x, tail[i].y, 3);
+        tail[i].z++;
+    }
 }
 
 //--------------------------------------------------------------
 
 //--------------------------------------------------------------
 void Projectile::update(){
-    if (traveling%2 == 0) {
-        position.x += (pointA.x - position.x) * .1;
-        position.y += (pointA.y - position.y) * .1;
-        if (ofDist(position.x, position.y, pointA.x, pointA.y) < 1) {
+    if (points.size() > 0) {
+        tail.push_back(position);
+        int which = traveling%points.size();
+        position.x += (points[which].x - position.x) * .1;
+        position.y += (points[which].y - position.y) * .1;
+        if (ofDist(position.x, position.y, points[which].x, points[which].y) < 5) {
             traveling++;
         }
     }
-    else {
-        position.x += (pointB.x - position.x) * .1;
-        position.y += (pointB.y - position.y) * .1;
-        if (ofDist(position.x, position.y, pointB.x, pointB.y) < 1) {
-            traveling++;
-        }
+    tail.erase( remove_if(tail.begin(), tail.end(), tooLong), tail.end() );
 
-    }
+ }
+
+//--------------------------------------------------------------
+
+void Projectile::add(ofPoint point) {
+    points.push_back(point);
 }
 
 //--------------------------------------------------------------
 
-//--------------------------------------------------------------
-void Projectile::set(ofPoint a, ofPoint b){
-    position.x = (a.x + b.x) / 2;
-    position.y = (a.y + b.y) / 2;
-    pointA = a;
-    pointB = b;
-    traveling = 0;
+void Projectile::hit(Enemy * enemy) {
+    if (ofDist(enemy->position.x, enemy->position.y, position.x, position.y) <= ENEMY_SIZE + PROJECTILE_SIZE) {
+       enemy->dead = true;
+    }
 }
-
-//--------------------------------------------------------------

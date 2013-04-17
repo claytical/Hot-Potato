@@ -5,19 +5,23 @@
 //  Created by Clay Ewing on 4/17/13.
 //
 //
+#define TAIL_SIZE 200
+#define PROJECTILE_SIZE 5
 
 #include "ofMain.h"
+#include "Enemy.h"
 
 class Projectile{
 
 public:
 
     void show();
-    void set(ofPoint a, ofPoint b);
+    void add(ofPoint point);
     void update();
+    void hit(Enemy *);
     int traveling;
-    ofPoint pointA;
-    ofPoint pointB;
+    vector <ofPoint> points;
+    vector <ofPoint> tail;
     ofPoint position;
     
 };
