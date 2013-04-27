@@ -2,6 +2,15 @@
 bool dead(Enemy enemy){
     return (enemy.dead);
 }
+
+bool outOfBounds(Enemy enemy) {
+    if (enemy.position.x > ofGetWidth() || enemy.position.x < 0 || enemy.position.y > ofGetHeight()) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
 //--------------------------------------------------------------
 void testApp::setup(){	
 	// initialize the accelerometer
@@ -9,16 +18,11 @@ void testApp::setup(){
 	
 	//If you want a landscape oreintation 
 	iPhoneSetOrientation(OFXIPHONE_ORIENTATION_LANDSCAPE_RIGHT);
-	
+	ofSetRectMode(OF_RECTMODE_CENTER);
 	ofBackground(0);
     ofEnableAlphaBlending();
-    /*
-    for (int i = 0; i < NUMBER_OF_ENEMIES; i++) {
-        Enemy tmpEnemy;
-        tmpEnemy.set(ofPoint(ofRandom(ofGetWidth(), ofRandom(-ofGetHeight()))), ofRandom(-3));
-        enemies.push_back(tmpEnemy);
-    }
-     */
+    ofEnableSmoothing();
+    score = 0;
 }
 
 //--------------------------------------------------------------
@@ -26,27 +30,33 @@ void testApp::update(){
     myProjectile.update();
     for (int i = 0; i < enemies.size(); i++) {
         enemies[i].update();
-        myProjectile.hit(&enemies[i]);
+        if(myProjectile.hit(&enemies[i])) {
+            score++;
+        }
     }
 
     if ((int)ofGetElapsedTimef()%10 == 0) {
         Enemy tmpEnemy;
-        tmpEnemy.set(ofPoint(ofRandom(ofGetWidth(), ofRandom(-ofGetHeight()))), ofRandom(-3));
+        int x = ofMap(ofRandomWidth(), 0, ofGetWidth(), BORDER, ofGetWidth() - BORDER);
+        int y = ofMap(ofRandomHeight(), 0, ofGetHeight(), BORDER, ofGetHeight() - BORDER);
+        tmpEnemy.set(ofPoint(x,y), ofPoint(ofRandom(-3,3), ofRandom(-3, 3)));
         enemies.push_back(tmpEnemy); 
     }
-    enemies.erase( remove_if(enemies.begin(), enemies.end(), dead), enemies.end() );
-
+  //  enemies.erase(remove_if(enemies.begin(), enemies.end(), dead), enemies.end() );
+    enemies.erase(remove_if(enemies.begin(), enemies.end(), outOfBounds), enemies.end());
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
+
+    myProjectile.show();
 	for (int i = 0; i < fingers.size(); i++) {
         fingers[i].show();
     }
-    myProjectile.show();
     for (int i = 0; i < enemies.size(); i++) {
         enemies[i].show();
     }
+
 }
 
 //--------------------------------------------------------------
@@ -56,46 +66,38 @@ void testApp::exit(){
 
 //--------------------------------------------------------------
 void testApp::touchDown(ofTouchEventArgs & touch){
-    if (touch.id < MAX_FINGERS) {
-        bool movingFinger = false;
-        int fingerId = 0;
-
-        for (int i = 0; i < fingers.size(); i++) {
-            if (fingers[i].id == touch.id) {
-                //finger already exists, move it.
-                movingFinger = true;
-                fingerId = i;
-            }
-        }
-        if (movingFinger) {
-            fingers[fingerId].set(touch.x, touch.y);
-            myProjectile.points[fingerId].set(touch.x, touch.y);
-
-        }
-        else {
-            Finger newFinger;
-            newFinger.set(touch.x, touch.y);
-            newFinger.id = touch.id;
-            fingers.push_back(newFinger);        
-            myProjectile.add(ofPoint(touch.x, touch.y));
-
+    int fingerId = 999;
+    bool moveExisting = false;
+    for (int i = 0; i < fingers.size(); i++) {
+        if (fingers[i].touching(touch.x, touch.y)) {
+            fingerId = i;
+            moveExisting = true;
+            break;
         }
     }
+    
+    if (!moveExisting) {
+        Finger newFinger;
+        newFinger.set(touch.x, touch.y);
+        newFinger.id = touch.id;
+        fingers.push_back(newFinger);
+        myProjectile.add(ofPoint(touch.x, touch.y));
+
+    }
+    
+
 }
 
 //--------------------------------------------------------------
 void testApp::touchMoved(ofTouchEventArgs & touch){
-    int fingerId = 0;
     for (int i = 0; i < fingers.size(); i++) {
-        if (fingers[i].id == touch.id) {
-            //finger already exists, move it.
-            fingerId = i;
+        if (fingers[i].touching(touch.x, touch.y)) {
+            fingers[i].set(touch.x, touch.y);
+            myProjectile.points[i].set(touch.x, touch.y);
 
         }
-        
     }
-    myProjectile.points[fingerId].set(touch.x, touch.y);
-    fingers[fingerId].set(touch.x, touch.y);
+
 }
 
 //--------------------------------------------------------------

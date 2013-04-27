@@ -1,6 +1,7 @@
 #pragma once
 #define MAX_FINGERS 5
 #define NUMBER_OF_ENEMIES   200
+#define BORDER  20
 
 #include "ofMain.h"
 #include "ofxiPhone.h"
@@ -27,10 +28,11 @@ class testApp : public ofxiPhoneApp{
         void gotFocus();
         void gotMemoryWarning();
         void deviceOrientationChanged(int newOrientation);
-
+        int score;
         vector<Finger> fingers;
         vector<Enemy> enemies;
         Projectile myProjectile;
+//        vector<Projectile> projectiles;
 };
 
 

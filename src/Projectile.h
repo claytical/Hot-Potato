@@ -18,7 +18,7 @@ public:
     void show();
     void add(ofPoint point);
     void update();
-    void hit(Enemy *);
+    bool hit(Enemy *);
     int traveling;
     vector <ofPoint> points;
     vector <ofPoint> tail;

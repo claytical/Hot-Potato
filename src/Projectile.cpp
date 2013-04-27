@@ -14,9 +14,11 @@ bool tooLong(ofPoint point){
 //--------------------------------------------------------------
 void Projectile::show(){
     ofSetColor(255, 255, 0, 255);
+    ofFill();
     ofCircle(position.x, position.y, PROJECTILE_SIZE);
     for (int i = 0; i < tail.size(); i++) {
-        ofSetColor(255, 255, 0, ofMap(i, 0, TAIL_SIZE, 0, 127));
+        ofNoFill();
+        ofSetColor(255, 127, 0, ofMap(i, 0, TAIL_SIZE, 0, 50));
         ofCircle(tail[i].x, tail[i].y, 3);
         tail[i].z++;
     }
@@ -47,8 +49,12 @@ void Projectile::add(ofPoint point) {
 
 //--------------------------------------------------------------
 
-void Projectile::hit(Enemy * enemy) {
+bool Projectile::hit(Enemy * enemy) {
     if (ofDist(enemy->position.x, enemy->position.y, position.x, position.y) <= ENEMY_SIZE + PROJECTILE_SIZE) {
        enemy->dead = true;
+        return true;
+    }
+    else {
+        return false;
     }
 }

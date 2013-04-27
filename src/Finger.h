@@ -12,6 +12,7 @@ class Finger{
     public:
     void show();
     void set(float x, float y);
+    bool touching(float x, float y);
     ofPoint position;
     bool moving;
     int id;

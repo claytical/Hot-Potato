@@ -11,11 +11,19 @@
 
 //--------------------------------------------------------------
 void Finger::show(){
-    ofSetColor(255, 0, 0);
-    ofCircle(position.x, position.y, 50);
+    ofNoFill();
+    ofSetColor(127);
+    ofRect(position.x, position.y, 50, 50);
+    ofFill();
+    ofSetColor(200);
+    ofRect(position.x, position.y, 10, 10);
 }
 
 //--------------------------------------------------------------
+
+bool Finger::touching(float x, float y) {
+    return (ofDist(x, y, position.x, position.y) <= 25);
+}
 
 //--------------------------------------------------------------
 void Finger::set(float x, float y){

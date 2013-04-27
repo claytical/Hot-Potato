@@ -14,10 +14,10 @@
 class Enemy{
     
 public:
-    void set(ofPoint pos, float s);
+    void set(ofPoint pos, ofPoint s);
     void show();
     void update();
-    float speed;
+    ofPoint speed;
     ofPoint position;
     bool dead;
     
